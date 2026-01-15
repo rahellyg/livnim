@@ -8,6 +8,8 @@ export default function LevavimMoshavSite() {
   const [isArchiveMenuOpen, setIsArchiveMenuOpen] = useState(false);
   const [isRealEstateMenuOpen, setIsRealEstateMenuOpen] = useState(false);
   const [isCoursesMenuOpen, setIsCoursesMenuOpen] = useState(false);
+  const [isBulletinOpen, setIsBulletinOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [contactForm, setContactForm] = useState({
     name: '',
     email: '',
@@ -130,12 +132,20 @@ export default function LevavimMoshavSite() {
       }
     };
 
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
     if (isBusinessMenuOpen || isArchiveMenuOpen || isRealEstateMenuOpen || isCoursesMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('resize', handleResize);
     };
   }, [isBusinessMenuOpen, isArchiveMenuOpen, isRealEstateMenuOpen, isCoursesMenuOpen]);
 
@@ -150,10 +160,10 @@ export default function LevavimMoshavSite() {
   const buttonStyle = {
     display:'flex', 
     alignItems:'center', 
-    gap:'10px', 
-    fontSize:'18px', 
+    gap: isMobile ? '8px' : '10px', 
+    fontSize: isMobile ? '16px' : '18px', 
     color:'#2f4f3f', 
-    padding:'18px 30px', 
+    padding: isMobile ? '14px 20px' : '18px 30px', 
     background:'linear-gradient(135deg, #ffffff 0%, #fefcf8 50%, #faf8f3 100%)',
     borderRadius:'14px', 
     boxShadow:'0 4px 16px rgba(139, 195, 74, 0.15), 0 2px 8px rgba(47, 79, 63, 0.1)', 
@@ -255,7 +265,8 @@ export default function LevavimMoshavSite() {
       position:'relative',
       backgroundImage:'radial-gradient(circle at 20% 50%, rgba(139, 195, 74, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255, 193, 7, 0.05) 0%, transparent 50%)'
     }}>
-      {/* לוח מודעות מצד ימין */}
+      {/* לוח מודעות מצד ימין - מותנה במסך גדול או כפתור במובייל */}
+      {!isMobile && (
       <div style={{
         position:'fixed',
         right:0,
@@ -346,19 +357,123 @@ export default function LevavimMoshavSite() {
           </motion.div>
         </div>
       </div>
+      )}
 
-      {/* תוכן ראשי עם margin-right ללוח מודעות */}
-      <div style={{marginRight:'300px'}}>
+      {/* כפתור לוח מודעות למובייל */}
+      {isMobile && (
+        <>
+          <button
+            onClick={() => setIsBulletinOpen(!isBulletinOpen)}
+            style={{
+              position: 'fixed',
+              bottom: '20px',
+              right: '20px',
+              zIndex: 200,
+              background: 'linear-gradient(135deg, #4a7c59 0%, #2f4f3f 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '50%',
+              width: '60px',
+              height: '60px',
+              fontSize: '24px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            📢
+          </button>
+
+          {isBulletinOpen && (
+            <div 
+              style={{
+                position: 'fixed',
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
+                background: 'rgba(0,0,0,0.5)',
+                zIndex: 150,
+                display: 'flex',
+                alignItems: 'flex-end'
+              }}
+              onClick={() => setIsBulletinOpen(false)}
+            >
+              <div 
+                style={{
+                  width: '100%',
+                  maxHeight: '70vh',
+                  background: 'linear-gradient(180deg, #4a7c59 0%, #3d6b4a 30%, #2f4f3f 100%)',
+                  color: 'white',
+                  borderTopLeftRadius: '20px',
+                  borderTopRightRadius: '20px',
+                  padding: '20px',
+                  overflowY: 'auto'
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '20px',
+                  paddingBottom: '15px',
+                  borderBottom: '2px solid rgba(255,255,255,0.2)'
+                }}>
+                  <h3 style={{margin: 0, fontSize: '20px'}}>📢 לוח מודעות</h3>
+                  <button
+                    onClick={() => setIsBulletinOpen(false)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'white',
+                      fontSize: '28px',
+                      cursor: 'pointer',
+                      padding: '0',
+                      width: '30px',
+                      height: '30px'
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+                <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
+                  {announcements.map((announcement, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        background: 'rgba(255,255,255,0.1)',
+                        padding: '15px',
+                        borderRadius: '10px',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        fontSize: '14px',
+                        lineHeight: '1.6'
+                      }}
+                    >
+                      {announcement}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* תוכן ראשי עם margin-right רק במסך גדול */}
+      <div style={{marginRight: isMobile ? '0' : '300px'}}>
       <header style={{
         background:'linear-gradient(135deg, #4a7c59 0%, #3d6b4a 30%, #2f4f3f 60%, #1a3328 100%)', 
         color:'white', 
-        padding:'90px 30px', 
+        padding: isMobile ? '60px 20px' : '90px 30px', 
         boxShadow:'0 8px 32px rgba(0,0,0,0.25)',
         display:'flex', 
         flexDirection:'column', 
         alignItems:'center', 
         justifyContent:'center', 
-        gap:'25px',
+        gap: isMobile ? '15px' : '25px',
         position:'relative',
         overflow:'hidden',
         borderBottom:'4px solid rgba(255, 193, 7, 0.3)'
@@ -389,7 +504,7 @@ export default function LevavimMoshavSite() {
           animate={{opacity:1, scale:1}}
           transition={{duration:0.6}}
           style={{
-            height:'140px', 
+            height: isMobile ? '100px' : '140px', 
             width:'auto',
             filter:'drop-shadow(0 8px 16px rgba(0,0,0,0.3))',
             position:'relative',
@@ -403,11 +518,11 @@ export default function LevavimMoshavSite() {
           style={{
             margin:0, 
             color:'white', 
-            fontSize:'52px', 
+            fontSize: isMobile ? '32px' : '52px', 
             fontWeight:'bold', 
             textAlign:'center',
             textShadow:'0 4px 12px rgba(0,0,0,0.4)',
-            letterSpacing:'2px',
+            letterSpacing: isMobile ? '1px' : '2px',
             position:'relative',
             zIndex:1
           }}
@@ -446,8 +561,8 @@ export default function LevavimMoshavSite() {
       <section style={{
         display:'flex', 
         justifyContent:'center', 
-        gap:'25px', 
-        padding:'60px 40px', 
+        gap: isMobile ? '15px' : '25px', 
+        padding: isMobile ? '30px 15px' : '60px 40px', 
         flexWrap:'wrap', 
         background:'linear-gradient(135deg, #faf8f3 0%, #ffffff 50%, #f8f6f0 100%)',
         position:'relative',
