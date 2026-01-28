@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Calendar, Users, MessageCircle, ChevronDown, Archive, Mail, Store, Phone, MapPin, Home, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export default function LevavimMoshavSite() {
   const [isBusinessMenuOpen, setIsBusinessMenuOpen] = useState(false);
